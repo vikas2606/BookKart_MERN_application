@@ -19,6 +19,7 @@ function Register() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [passwordsMatch, setPasswordsMatch] = useState(false);
   const [allFieldsFilled, setAllFieldsFilled] = useState(false);
+  const [isPasswordValid, setIsPasswordValid] = useState(false);
 
   const userRegister = useSelector((state) => state.userRegister);
   const { register_loading, register_error, register_userInfo } = userRegister;
@@ -45,11 +46,19 @@ function Register() {
     }
   }, [first_name, last_name, email, password, confirmPassword]);
 
+  useEffect(() => {
+    const passwordPattern = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+    setIsPasswordValid(passwordPattern.test(password));
+  }, [password]);
+
   const submitHandler = (e) => {
     e.preventDefault();
 
     dispatch(register(first_name, last_name, email, password));
   };
+
+  const isButtonDisabled =
+    !passwordsMatch || !allFieldsFilled || !isPasswordValid;
 
   return (
     <div className="w-full bg-blu rounded-lg shadow-lg dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
@@ -102,6 +111,14 @@ function Register() {
                 setPassword(e.target.value);
               }}
             />
+            <p
+              className={`mt-2 text-sm ${
+                isPasswordValid ? "text-green-500" : "text-red-500"
+              }`}
+            >
+              Password must contain Numbers,Upper,lower cases and 8 characters
+              long
+            </p>
           </div>
           <div>
             <input
@@ -114,11 +131,20 @@ function Register() {
                 setConfirmPassword(e.target.value);
               }}
             />
+            {(confirmPassword !== "") && (
+              <p
+                className={`mt-2 text-sm ${
+                  passwordsMatch ? "text-green-500" : "text-red-500"
+                }`}
+              >
+                Passwords Matched
+              </p>
+            )}
           </div>
           <button
             className="btn disabled:bg-graye"
             type="submit"
-            disabled={!passwordsMatch || !allFieldsFilled}
+            disabled={isButtonDisabled}
           >
             {register_loading ? (
               <CircularProgress size={20} style={{ color: "orange" }} />

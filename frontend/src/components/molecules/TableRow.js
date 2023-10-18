@@ -24,7 +24,7 @@ const TableRow = ({ book }) => {
   const [publication_date, setPublicationDate] = useState(
     book.publication_date
   );
-  const [publisher, setPublisher] = useState(book.title);
+  const [publisher, setPublisher] = useState(book.publisher);
 
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -39,10 +39,17 @@ const TableRow = ({ book }) => {
   const dispatch = useDispatch();
 
   const handleAddToCart = () => {
-    dispatch(AddToCartAction(book._id, 1));
-    if (book_update_success) {
-      setIsUpdating(false);
-    }
+    setIsLoading(true);
+
+    // Dispatch the action to add the book to the cart
+    dispatch(AddToCartAction(book._id, 1))
+      .then(() => {
+        setIsLoading(false); // Set loading state back to false after success
+      })
+      .catch((error) => {
+        setIsLoading(false); // Set loading state back to false on error
+        console.error("Error adding book to cart:", error);
+      });
   };
 
   const deleteBookHandler = () => {
@@ -77,6 +84,7 @@ const TableRow = ({ book }) => {
       })
       .catch((error) => {
         console.error("Error updating the book:", error);
+        setIsUpdating(false)
       });
   };
 
@@ -124,10 +132,10 @@ const TableRow = ({ book }) => {
               </button>
               <button
                 className="hover:text-orng disabled:text-graye"
-                disabled={cart_create_loading || isLoading}
+                disabled={cart_create_loading && isLoading}
                 onClick={handleAddToCart}
               >
-                {isLoading ? (
+                {(isLoading) ? (
                   <CircularProgress size={20} style={{ color: "orange" }} />
                 ) : (
                   <AddShoppingCartOutlinedIcon />
@@ -137,10 +145,10 @@ const TableRow = ({ book }) => {
           ) : (
             <button
               className="btn bg-blue-700 disabled:bg-graye"
-              disabled={cart_create_loading || isLoading}
+              disabled={cart_create_loading && isLoading}
               onClick={handleAddToCart}
             >
-              {isLoading ? (
+              {(isLoading )  ? (
                 <CircularProgress size={20} style={{ color: "orange" }} />
               ) : (
                 <AddShoppingCartOutlinedIcon />
