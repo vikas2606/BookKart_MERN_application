@@ -5,6 +5,8 @@ const bookSchema=mongoose.Schema(
     bookID:{
         type:Number,
         required:true,
+        unique:true
+        
     },
     title:{
         type:String,
@@ -57,9 +59,24 @@ const bookSchema=mongoose.Schema(
         type:String,
         required:true
     },
+    price:{
+        type:Number,
+        required:true,
+        default:0
+    }
 }
 ) 
 
-const book=mongoose.model("books",bookSchema)
+const Book=mongoose.model("books",bookSchema)
 
-module.exports=book
+async function findHighestBookID() {
+    try {
+        const highestBook = await Book.findOne({}, {}, { sort: { 'bookID': -1 } });
+        return highestBook ? highestBook.bookID : 0;
+    } catch (error) {
+        console.error("Error finding highest bookID:", error);
+        return 0;
+    }
+}
+
+module.exports={Book,findHighestBookID}

@@ -1,42 +1,51 @@
 const { useAsyncError } = require("react-router-dom");
-const Book = require("../models/bookModel");
+const { Book, findHighestBookID } = require("../models/bookModel");
 const asyncHandler = require("express-async-handler");
 
 const getBooks = asyncHandler(async (req, res) => {
-  const page=parseInt(req.query.page) || 1
-  const limit=parseInt(req.query.limit) || 10
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const query = req.query.query;
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
 
-  const startIndex=(page-1)*limit
-  const endIndex=page*limit
+  const searchQuery = query
+    ? {
+        $or: [
+          { title: { $regex: query, $options: "i" } },
+          { authors: { $regex: query, $options: "i" } },
+        ],
+      }
+    : {};
 
-  const total =await Book.countDocuments();
-  const books=await Book.find().skip(startIndex).limit(limit)
+  try {
+    const books = await Book.find(searchQuery).skip(startIndex).limit(limit);
+    const total = await Book.countDocuments(searchQuery);
 
-  const response={
-    currentPage:page,
-    totalPages:Math.ceil(total/limit),
-    books,
+    const response = {
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      books,
+    };
+
+    res.json(response);
+  } catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
   }
-
-  res.json(response)
-
-  
 });
 
 const createBook = asyncHandler(async (req, res) => {
+  const highestBookID = await findHighestBookID();
+  const bookID = highestBookID + 1;
   const {
-    bookID,
     title,
     authors,
-    average_rating,
-    isbn,
-    isbn13,
     language_code,
     num_pages,
-    ratings_count,
-    text_reviews_count,
+
     publication_date,
     publisher,
+    price,
   } = req.body;
 
   if (!bookID) {
@@ -47,15 +56,13 @@ const createBook = asyncHandler(async (req, res) => {
       bookID,
       title,
       authors,
-      average_rating,
-      isbn,
-      isbn13,
+
       language_code,
       num_pages,
-      ratings_count,
-      text_reviews_count,
+
       publication_date,
       publisher,
+      price,
     });
 
     const createdBook = await book.save();
@@ -75,16 +82,10 @@ const getBookbyId = asyncHandler(async (req, res) => {
 
 const updateBook = asyncHandler(async (req, res) => {
   const {
-    bookID,
     title,
     authors,
-    average_rating,
-    isbn,
-    isbn13,
     language_code,
     num_pages,
-    ratings_count,
-    text_reviews_count,
     publication_date,
     publisher,
   } = req.body;
@@ -92,16 +93,12 @@ const updateBook = asyncHandler(async (req, res) => {
   const book = await Book.findById(req.params.id);
 
   if (book) {
-    book.bookID = bookID;
     book.title = title;
     book.authors = authors;
-    book.average_rating = average_rating;
-    book.isbn = isbn;
-    book.isbn13 = isbn13;
+
     book.language_code = language_code;
     book.num_pages = num_pages;
-    book.ratings_count = ratings_count;
-    book.text_reviews_count = text_reviews_count;
+
     book.publication_date = publication_date;
     book.publisher = publisher;
 
@@ -113,8 +110,7 @@ const updateBook = asyncHandler(async (req, res) => {
   }
 });
 
-
-const deleteBook=asyncHandler(async(req,res)=>{
+const deleteBook = asyncHandler(async (req, res) => {
   const book = await Book.findById(req.params.id);
 
   if (book) {
@@ -124,8 +120,6 @@ const deleteBook=asyncHandler(async(req,res)=>{
     res.status(404);
     throw new Error("Note not Found");
   }
-}
-)
+});
 
-
-module.exports = { getBooks, createBook, getBookbyId, updateBook,deleteBook };
+module.exports = { getBooks, createBook, getBookbyId, updateBook, deleteBook };

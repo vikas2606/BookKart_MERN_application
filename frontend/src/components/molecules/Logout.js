@@ -17,10 +17,10 @@ function Logout() {
        navigate("/")
     }
 
-    useEffect(() => {}, [userInfo]);
+    
 
   return (
-    <button class="btn" aria-current="page" onClick={logoutHandler}>
+    <button className="btn" aria-current="page" onClick={logoutHandler}>
       <LogoutIcon />
     </button>
   );

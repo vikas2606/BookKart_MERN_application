@@ -1,12 +1,35 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import SearchIcon from '@mui/icons-material/Search';
+import { useDispatch } from "react-redux";
+import { listBooks } from "../store/actions/bookActions";
 
 function SearchBar() {
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  const dispatch=useDispatch()
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [query,setQuery]=useState("")
+  const [timeoutId, setTimeoutId] = useState(null);
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
   };
+
+
+  const handleInputChange = (e) => {
+    clearTimeout(timeoutId); 
+    const newQuery = e.target.value;
+    setQuery(newQuery);
+    const newTimeoutId = setTimeout(() => {
+     dispatch(listBooks(query))
+    }, 1000);
+
+    setTimeoutId(newTimeoutId);
+  };
+
+  useEffect(() => {
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [timeoutId]);
 
   return (
     <div>
@@ -34,6 +57,8 @@ function SearchBar() {
 
         </div>
         <input
+        value={query}
+        onChange={handleInputChange}
           type="text"
           id="search-navbar"
           className="block w-full p-2 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"

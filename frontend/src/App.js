@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter,
   Routes,
@@ -10,19 +10,17 @@ import SignUpPage from "./components/pages/SignUpPage";
 import Login from "./components/organisms/Login";
 import Register from "./components/organisms/Register";
 import Homepage from "./components/pages/Homepage";
+import { useDispatch, useSelector } from "react-redux";
+import { listBooks } from "./components/store/actions/bookActions";
+import { useNavigate } from "react-router-dom";
+import BookList from "./components/organisms/BookList";
+import Root from "./components/Root";
 
 function App() {
+
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<SignUpPage />}>
-          <Route index element={<Login />} />
-          <Route path="Login" element={<Login />} />
-          <Route path="Register" element={<Register />} />
-        </Route>
-
-        <Route path="Home" element={<Homepage />} />
-      </Routes>
+      <Root />
     </BrowserRouter>
   );
 }

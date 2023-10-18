@@ -16,7 +16,9 @@ function Login() {
   const [password, setPassword] = useState("");
 
   const userLogin = useSelector((state) => state.userLogin);
-  const { loading, errorMessage, userInfo } = userLogin;
+  const {user_loading, user_error, userInfo } = userLogin;
+
+
 
   useEffect(() => {
     if (userInfo) {
@@ -34,7 +36,7 @@ function Login() {
       <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
         <h1 className="h1">Sign in to your account</h1>
         <form className="space-y-4 md:space-y-6" onSubmit={submitHandler}>
-          {errorMessage && <Alert message={errorMessage} />}
+          {user_error && <Alert message={user_error}/>}
           <div>
             <input
               type="email"
@@ -59,10 +61,10 @@ function Login() {
           </div>
           <button
             className="btn disabled:bg-graye"
-            disabled={loading}
+            disabled={user_loading}
             type="submit"
           >
-            {loading ? (
+            {user_loading ? (
               <CircularProgress size={20} style={{ color: "orange" }} />
             ) : (
               "Login"
@@ -72,7 +74,7 @@ function Login() {
             Don't have an account yet?{" "}
             <Link
               to="/Register"
-              class="font-medium text-orng hover:underline dark:text-primary-500"
+              className="font-medium text-orng hover:underline dark:text-primary-500"
             >
               Sign up
             </Link>

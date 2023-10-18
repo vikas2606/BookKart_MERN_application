@@ -1,27 +1,19 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import { useSelector } from "react-redux"
-import Register from "../organisms/Register";
-import Login from "../organisms/Login";
 import { Outlet } from "react-router-dom";
 
 function SignUpPage({location}) {
-  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
+    const userInfo = sessionStorage.getItem("userInfo");
 
     if (userInfo) {
       navigate("/Home");
     }
   }, [location]);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    console.log("hi");
-  };
+
 
   return (
     <section className="bg-dark-blu">
