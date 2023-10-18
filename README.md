@@ -56,3 +56,13 @@ In the root folder
 
 https://bookkart-cune.onrender.com
 
+Login as Admin to enable create ,delete and update book
+
+Credentials
+```bash
+admin@email.com
+admin
+```
+
+You can also register as normal user
+
