@@ -66,7 +66,6 @@ const removeFromCart = asyncHandler(async (req, res) => {
 });
 
 const getCart = asyncHandler(async (req, res) => {
-  console.log(req.user._id)
   const cart = await Cart.findOne({ user: req.user._id }).populate(
     "items.book",
     "title price"
@@ -81,7 +80,6 @@ const getCart = asyncHandler(async (req, res) => {
 
 const increaseQuantity = asyncHandler(async (req, res) => {
   const { bookId } = req.body; // Retrieve bookId from the request body
-  console.log(bookId);
 
   if (!mongoose.Types.ObjectId.isValid(bookId)) {
     res.status(400);
@@ -90,7 +88,6 @@ const increaseQuantity = asyncHandler(async (req, res) => {
   }
 
   const cart = await Cart.findOne({ user: req.user._id });
-  console.log(cart);
 
   if (!cart) {
     res.status(404);
